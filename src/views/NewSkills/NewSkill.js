@@ -22,7 +22,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
 
-const API_URL = 'https://dev.specialisedjobs.com:5009/adminpanel/APTemplates';
+const API_URL = 'https://dev.specialisedjobs.com:8080/adminpanel/APTemplates';
 
 const styles = theme => ({
   cardCategoryWhite: {
@@ -72,11 +72,9 @@ class NewSkill extends React.Component {
 
   componentDidMount() {
     const url = `${API_URL}/skills/`;
-    
     axios.get(url).then(response => response.data)
       .then((data) => {
-        debugger
-        this.setState({ skills: data })
+        this.setState({ skills: data.data })
         console.log(this.state.skills)
       })
 
@@ -89,8 +87,7 @@ class NewSkill extends React.Component {
     })
   }
 
-
-  handlePost = event => {
+handlePost = event => {
     const url = `${API_URL}/skills/`;
     const newSkills = {
       title: this.state.newskill
@@ -103,12 +100,18 @@ class NewSkill extends React.Component {
         newskill: ''
       })
   }
+  
 
-  handleDelete (id){
-    axios.delete('https://dev.specialisedjobs.com:5009/adminpanel/APTemplates/skills?skillid='+{id})
+  handleDelete (_id){
+    debugger
+    axios.delete('https://dev.specialisedjobs.com:5009/adminpanel/APTemplates/skills?skillid='+_id)
     .then(res => {
+      
       console.log(res);
       console.log(res.data);
+
+      const skills = this.state.skills.filter(skills => skills._id !== _id);
+        this.setState({ skills });
     })
   }
 
@@ -162,16 +165,16 @@ class NewSkill extends React.Component {
               </TableHead>
               <TableBody>
                 {
-                  this.state.skills.map((skills, index) => (
+                  this.state.skills ? this.state.skills.map((skills, index) => (
                     <TableRow key={index}>
                       <TableCell component="th" scope="row">
-                        {skills.title}
-                      
-                        
+                        {skills.title}     
                       </TableCell>
-                      <TableCell align="left"><CancelIcon  onClick={(id) => this.handleDelete(skills._id)} /></TableCell>
+                      <TableCell align="left">
+                        <CancelIcon  onClick={(_id) => this.handleDelete(skills._id)} />
+                        </TableCell>
                     </TableRow>
-                  ))}
+                  )) : ""}
               </TableBody>
             </Table>
           </TableContainer>
